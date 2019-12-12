@@ -1,9 +1,11 @@
 package com.yikai.activemq.queue;
 
 
+import com.yikai.util.CommonUtil;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
+import java.util.Date;
 
 /**
  * @Description 如果是点对点传输的话  目的地就是队列;  如果是一对多传输的话,目的地就是主题;
@@ -19,21 +21,26 @@ public class JmsProduce {
 
     public static void main(String[] args) {
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
+        Connection connection = null;
+        Session session = null;
+        MessageProducer producer = null;
         try {
-            Connection connection = activeMQConnectionFactory.createConnection();
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            connection = activeMQConnectionFactory.createConnection();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Queue queue = session.createQueue(QUEUE_NAME);
-            MessageProducer producer = session.createProducer(queue);
-            TextMessage message = session.createTextMessage("这是第二条数据");
-            producer.send(message);
+            producer = session.createProducer(queue);
+            for (int i = 1; i < 11; i++) {
+                TextMessage message = session.createTextMessage(new Date() + "的消息编号:  " + i);
+                producer.send(message);
+                System.out.println(message.getText());
+//                Thread.sleep(30000);
+            }
 
-            producer.close();
-            session.close();
-            connection.close();
-            System.out.println("发送完成");
-
+            System.out.println("发送成功");
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            CommonUtil.close(producer,null,session,connection);
         }
     }
 }
