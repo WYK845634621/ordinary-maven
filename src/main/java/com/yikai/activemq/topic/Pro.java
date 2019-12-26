@@ -1,5 +1,4 @@
-package com.yikai.activemq.queue;
-
+package com.yikai.activemq.topic;
 
 import com.yikai.util.CommonUtil;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -8,16 +7,15 @@ import javax.jms.*;
 import java.util.Date;
 
 /**
- * @Description 如果是点对点传输的话  目的地就是队列;  如果是一对多传输的话,目的地就是主题;
+ * @Description
  * @Tips
  * @Author yikai.wang
- * @Date 2019/12/11 16:36
+ * @Date 2019/12/13 11:10
  */
-public class JmsProduce {
-
+public class Pro {
     public static final String ACTIVEMQ_URL = "tcp://192.168.187.129:61616";
 
-    public static final String QUEUE_NAME = "queue_yikai_001";
+    public static final String TOPIC_NAME = "topic_yikai_001";
 
     public static void main(String[] args) {
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(ACTIVEMQ_URL);
@@ -26,17 +24,16 @@ public class JmsProduce {
         MessageProducer producer = null;
         try {
             connection = activeMQConnectionFactory.createConnection();
+            connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Queue queue = session.createQueue(QUEUE_NAME);
-            producer = session.createProducer(queue);
-            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            for (int i = 1; i < 11; i++) {
-                TextMessage message = session.createTextMessage(new Date() + "的消息编号:  " + i);
-                producer.send(message);
-                System.out.println(message.getText());
-//                Thread.sleep(30000);
-            }
+            Topic topic = session.createTopic(TOPIC_NAME);
+            producer = session.createProducer(topic);
+            for (int i = 0; i < 10; i++) {
+                TextMessage text = session.createTextMessage(new Date() + " 来自主题的消息编号:  " + i);
+//                text.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
+                producer.send(text);
 
+            }
             System.out.println("发送成功");
         }catch (Exception e){
             e.printStackTrace();
