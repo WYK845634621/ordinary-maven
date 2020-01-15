@@ -23,25 +23,27 @@ public class Cons {
         Session session = null;
         MessageConsumer consumer = null;
         try {
+            System.out.println("消费者三号");
             connection = activeMQConnectionFactory.createConnection();
-            connection.start();
+            connection.setClientID("三号");
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(TOPIC_NAME);
-            consumer = session.createConsumer(topic);
-            consumer.setMessageListener((Message message) -> {
-                    if (message != null && message instanceof TextMessage){
-                        TextMessage t = (TextMessage)message;
-                        try {
-                            System.out.println(t.getText());
-                        } catch (JMSException e) {
-                            e.printStackTrace();
-                        }
-                    }
-            });
+            /**
+             * 一定要先运行一次消费者,等于向MQ注册,类似声明订阅了这个主题,
+             * 然后再运行生产者发送消息,此时无论消费者是否在线(如果不在线,则下次上线时)都会接收到消息
+             */
+            TopicSubscriber subscriber = session.createDurableSubscriber(topic, "remark");
+            connection.start();
+
+            Message message = subscriber.receive();
+            while (null != message){
+                TextMessage text = (TextMessage) message;
+                System.out.println("接收到  " + text.getText());
+                message = subscriber.receive();
+            }
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            System.in.read();
             CommonUtil.close(null,consumer,session,connection);
         }
     }

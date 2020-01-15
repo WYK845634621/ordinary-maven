@@ -26,10 +26,10 @@ public class JmsProduce {
         MessageProducer producer = null;
         try {
             connection = activeMQConnectionFactory.createConnection();
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
             Queue queue = session.createQueue(QUEUE_NAME);
             producer = session.createProducer(queue);
-            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             for (int i = 1; i < 11; i++) {
                 TextMessage message = session.createTextMessage(new Date() + "的消息编号:  " + i);
                 producer.send(message);

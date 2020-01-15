@@ -24,13 +24,13 @@ public class Pro {
         MessageProducer producer = null;
         try {
             connection = activeMQConnectionFactory.createConnection();
-            connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(TOPIC_NAME);
             producer = session.createProducer(topic);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+            connection.start();
             for (int i = 0; i < 10; i++) {
                 TextMessage text = session.createTextMessage(new Date() + " 来自主题的消息编号:  " + i);
-//                text.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
                 producer.send(text);
 
             }

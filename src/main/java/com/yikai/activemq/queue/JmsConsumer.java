@@ -25,23 +25,31 @@ public class JmsConsumer {
             session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
             Queue queue = session.createQueue(JmsProduce.QUEUE_NAME);
             consumer = session.createConsumer(queue);
-            consumer.setMessageListener(new MessageListener() {
-                @Override
-                public void onMessage(Message message) {
-                    if (message != null && message instanceof  TextMessage){
-                        TextMessage m = (TextMessage)message;
-                        try {
-                            System.out.println(m.getText());
-                        } catch (JMSException e) {
-                            e.printStackTrace();
-                        }
-                    }
+            while (true){
+                TextMessage message = (TextMessage) consumer.receive(4000L);
+                if (null != message){
+                    System.out.println(message.getText());
+                }else {
+                    break;
                 }
-            });
+            }
+//            consumer.setMessageListener(new MessageListener() {
+//                @Override
+//                public void onMessage(Message message) {
+//                    if (message != null && message instanceof  TextMessage){
+//                        TextMessage m = (TextMessage)message;
+//                        try {
+//                            System.out.println(m.getText());
+//                        } catch (JMSException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            });
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            System.in.read();
+//            System.in.read();
             CommonUtil.close(null,consumer,session,connection);
         }
     }
