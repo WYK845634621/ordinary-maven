@@ -1,28 +1,21 @@
 package com.yikai.es;
 
 import org.apache.http.HttpHost;
-import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,9 +67,9 @@ public class EsHelper {
 //            boolQueryBuilder.should(QueryBuilders.wildcardQuery("user","mc*"));
 //            boolQueryBuilder.should(QueryBuilders.wildcardQuery("user","*k*"));
             //模糊查询
-            WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("message", "*");
+            WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("message", "*message*");
             boolQueryBuilder.must(wildcardQueryBuilder);
-            boolQueryBuilder.must(QueryBuilders.rangeQuery("postDate").gte(new Date()).lte(new Date()));
+//            boolQueryBuilder.must(QueryBuilders.rangeQuery("@timestamp").gte(new Date()).lte(new Date()));
             builder.query(boolQueryBuilder);
             builder.timeout(new TimeValue(60, TimeUnit.SECONDS)).from(0).size(5);
             builder.sort(new FieldSortBuilder("_id").order(SortOrder.DESC));
@@ -86,7 +79,7 @@ public class EsHelper {
 //            builder.fetchSource(new String[]{"host","@version","message"},null);
             SearchRequest searchRequest = new SearchRequest();
             //指定索引
-            searchRequest.indices("hello-ccc");
+            searchRequest.indices("hello-142");
             searchRequest.source(builder);
 
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
