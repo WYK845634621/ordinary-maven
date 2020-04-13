@@ -29,6 +29,11 @@ import java.util.Properties;
 public class TTTT {
 
     @Test
+    public void sss(){
+        System.out.println((int)(Math.random()*3));
+    }
+
+    @Test
     public void test17(){
         //参数字符串，如果拼接在请求链接之后，需要对中文进行 URLEncode   字符集 UTF-8
         String param = "key=805639d6262d474e95945191cb63b49e&location=CN101100809";
